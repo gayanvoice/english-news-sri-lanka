@@ -51,7 +51,7 @@ public class ImageService {
     }
 
     private int renderLines(Graphics2D graphics2D, String text, int fontSize, int fontType,  int lineSize, int linePaddingTop, int paddingLeft, int lineLocation) {
-        graphics2D.setFont(new Font("Calibri", fontType, fontSize));
+        graphics2D.setFont(new Font("Arial", fontType, fontSize));
         for (String item:addLinebreaks(text, lineSize)) {
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics2D.drawString(item, paddingLeft, lineLocation);
