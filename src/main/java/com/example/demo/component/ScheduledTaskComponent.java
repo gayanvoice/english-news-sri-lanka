@@ -1,0 +1,141 @@
+package com.example.demo.component;
+
+import com.example.demo.model.PostsModel;
+import com.example.demo.model.data.FeedModel;
+import com.example.demo.service.*;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import java.net.URL;
+import java.net.URLConnection;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.List;
+
+@Component
+public class ScheduledTaskComponent {
+
+    @Value("${mode}")
+    private String mode;
+
+    @Value("${app.status.url}")
+    private String appUrl;
+
+    private static final Logger log = LoggerFactory.getLogger(ScheduledTaskComponent.class);
+    private final RestService restService;
+    private final ParseService parseService;
+    private final PostsService postsService;
+    private final FacebookService facebookService;
+
+    public ScheduledTaskComponent(RestService restService,
+                                  ParseService parseService,
+                                  PostsService postsService,
+                                  FacebookService facebookService) {
+        this.restService = restService;
+        this.parseService = parseService;
+        this.postsService = postsService;
+        this.facebookService = facebookService;
+    }
+
+    @Scheduled(fixedRate = 600000)
+    public void setAlive() {
+        if(mode.equals("prod")) {
+            if (restService.setAlive(appUrl)) {
+                log.info("set alive ok " + getCurrentTime());
+            } else {
+                log.error("set alive null " + getCurrentTime());
+            }
+        } else {
+            log.error("set alive dev " + getCurrentTime());
+        }
+    }
+
+    @Scheduled(fixedDelay = 900000)
+    public void fetchFeedUrlList() {
+        if(mode.equals("prod")) {
+            for (FeedModel feedModel : parseService.getFeedModel()) {
+                try {
+                    URL feedSource = new URL(feedModel.getUrl());
+                    SyndFeedInput syndFeedInput = new SyndFeedInput();
+                    try {
+                        URLConnection urlConnection = feedSource.openConnection();
+                        urlConnection.addRequestProperty("User-Agent", "Mozilla/4.0");
+                        SyndFeed feed = syndFeedInput.build(new XmlReader(urlConnection));
+                        List<SyndEntry> entries = feed.getEntries();
+                        int numberOfPostsExists = 0;
+                        for (SyndEntry syndEntry : entries) {
+                            log.info("getEntry()");
+                            if (numberOfPostsExists <= 3) {
+                                if (postsService.checkPostExists(syndEntry.getLink())) {
+                                    numberOfPostsExists = numberOfPostsExists + 1;
+                                    log.info("postExists() " + syndEntry.getTitle());
+                                } else {
+                                    PostsModel postsModel = parseService.parse(syndEntry, feedModel.getHostName().getValue());
+                                    if (postsModel.getContent() != null) {
+                                        postsService.addPost(postsModel);
+                                        log.info("addPost() " + postsModel.getTitle());
+                                    }
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                    } catch (Exception ignore) { }
+                } catch (Exception ignore) { }
+            }
+            log.info("getFeelModel()");
+        } else {
+            log.error("fetchFeedUrlList dev");
+        }
+    }
+
+    @Scheduled(fixedDelay = 900000)
+    public void postFaceBookFeed() {
+        if(mode.equals("prod")) {
+//            if (!isTimeBetweenRange()) {
+//                log.info("postFaceBookFeed()");
+//                newsService.getLatestPost().ifPresent(latestNewsModel -> {
+//                    newsService.getLatestNullPost().ifPresent(latestNullNewsModel -> {
+//                        if (latestNullNewsModel.getId() > (latestNewsModel.getId() - 10)) {
+//                            try {
+//                                Optional<FacebookResponseModel> facebookResponseModel = Optional
+//                                        .ofNullable(facebookService.postFaceBookFeedRequest(
+//                                                latestNullNewsModel.getTitle() +
+//                                                        "\n\n" + "#SinhalaNewsInfo " + "#" + latestNullNewsModel.getSite() +
+//                                                        "\n\n" + "\uD83D\uDD17 " + latestNullNewsModel.getUrl()));
+//                                if (facebookResponseModel.isPresent()) {
+//                                    latestNullNewsModel.setPost(facebookResponseModel.get().getId());
+//                                    newsService.updateNewsPostSocialMediaStatus(latestNullNewsModel);
+//                                    log.info("updateNewsPostSocialMediaStatus()");
+//                                }
+//                            } catch (Exception ignore) { }
+//
+//                        }
+//                    });
+//                });
+//            }
+        } else {
+            log.error("postFaceBookFeed dev");
+        }
+    }
+
+    private boolean isTimeBetweenRange() {
+        LocalTime start = LocalTime.of(0, 0);
+        LocalTime stop = LocalTime.of(6, 0);
+        ZoneId zoneId = ZoneId.of("Asia/Colombo");
+        LocalTime now = LocalTime.now(zoneId);
+        return (!now.isBefore(start)) && now.isBefore(stop);
+
+    }
+
+    private LocalDateTime getCurrentTime() {
+        return LocalDateTime.now(ZoneId.of("Asia/Colombo"));
+    }
+}
