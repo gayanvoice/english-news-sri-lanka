@@ -1,6 +1,6 @@
 package com.example.demo.component;
 
-import com.example.demo.model.PostsModel;
+import com.example.demo.model.PostModel;
 import com.example.demo.model.data.FeedModel;
 import com.example.demo.service.*;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -31,16 +31,16 @@ public class ScheduledTaskComponent {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTaskComponent.class);
     private final RestService restService;
     private final ParseService parseService;
-    private final PostsService postsService;
+    private final PostService postService;
     private final FacebookService facebookService;
 
     public ScheduledTaskComponent(RestService restService,
                                   ParseService parseService,
-                                  PostsService postsService,
+                                  PostService postService,
                                   FacebookService facebookService) {
         this.restService = restService;
         this.parseService = parseService;
-        this.postsService = postsService;
+        this.postService = postService;
         this.facebookService = facebookService;
     }
 
@@ -61,6 +61,7 @@ public class ScheduledTaskComponent {
     public void fetchFeedUrlList() {
         if(mode.equals("prod")) {
             for (FeedModel feedModel : parseService.getFeedModel()) {
+                log.info("getFeedModel " + feedModel.getHostName());
                 try {
                     URL feedSource = new URL(feedModel.getUrl());
                     SyndFeedInput syndFeedInput = new SyndFeedInput();
@@ -73,24 +74,28 @@ public class ScheduledTaskComponent {
                         for (SyndEntry syndEntry : entries) {
                             log.info("getEntry()");
                             if (numberOfPostsExists <= 3) {
-                                if (postsService.checkPostExists(syndEntry.getLink())) {
+                                if (postService.checkPostExists(syndEntry.getLink())) {
                                     numberOfPostsExists = numberOfPostsExists + 1;
                                     log.info("postExists() " + syndEntry.getTitle());
                                 } else {
-                                    PostsModel postsModel = parseService.parse(syndEntry, feedModel.getHostName().getValue());
-                                    if (postsModel.getContent() != null) {
-                                        postsService.addPost(postsModel);
-                                        log.info("addPost() " + postsModel.getTitle());
+                                    PostModel postModel = parseService.parse(syndEntry, feedModel.getHostName().getValue());
+                                    if (postModel.getContent() != null) {
+                                        postService.addPost(postModel);
+                                        log.info("addPost() " + postModel.getTitle());
                                     }
                                 }
                             } else {
                                 break;
                             }
                         }
-                    } catch (Exception ignore) { }
-                } catch (Exception ignore) { }
+                    } catch (Exception e) {
+                        System.out.println("send request to xml " + e);
+                    }
+                } catch (Exception e) {
+                    System.out.println("url error " + e);
+                }
             }
-            log.info("getFeelModel()");
+            log.info("getFeedModel()");
         } else {
             log.error("fetchFeedUrlList dev");
         }

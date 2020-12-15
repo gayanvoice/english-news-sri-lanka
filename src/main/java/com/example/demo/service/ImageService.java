@@ -21,17 +21,17 @@ public class ImageService {
     @Value("${app.name}")
     private String appName;
 
-    private final PostsService postsService;
+    private final PostService postService;
 
-    public ImageService(PostsService postsService) {
-        this.postsService = postsService;
+    public ImageService(PostService postService) {
+        this.postService = postService;
     }
 
     public InputStream createInputStream(String postId) throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedImage bufferedImage = ImageIO.read(getClass().getResourceAsStream("/static/image/template.jpg"));
 
-        postsService.findByPostId(postId).ifPresent(postModel -> {
+        postService.findByPostId(postId).ifPresent(postModel -> {
             Graphics2D graphics2D = createGraphics2D(bufferedImage, new ImageModel().getImageModel(postModel));
             graphics2D.dispose();
         });
@@ -44,9 +44,9 @@ public class ImageService {
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setColor(Color.WHITE);
         lineLocation = renderLines(graphics2D, imageModel.getTitle(), false,28, Font.PLAIN,20, 30, 20, lineLocation) + 10;
-        lineLocation = renderLines(graphics2D, imageModel.getDescription(), true, 20, Font.PLAIN, 40, 20, 20,  lineLocation) + 10;
+        lineLocation = renderLines(graphics2D, imageModel.getDescription(), true, 18, Font.PLAIN, 44, 20, 20,  lineLocation) + 10;
         lineLocation = renderLines(graphics2D, "Source: " + imageModel.getSource(), false,  18, Font.PLAIN, 50, 20, 20,  lineLocation);
-        lineLocation = renderLines(graphics2D, getTime() + " | " + getDate() + " | " + appName, false,16, Font.PLAIN, 50, 20, 50,  480);
+//        lineLocation = renderLines(graphics2D, getTime() + " | " + getDate() + " | " + appName, false,16, Font.PLAIN, 50, 20, 50,  480);
         return graphics2D;
     }
 
@@ -89,13 +89,17 @@ public class ImageService {
                 numberOfLines = numberOfLines + 1;
             }
 
-            output.append(word).append(" ");
+            output.append(word);
             lineLen += word.length();
 
-            if(numberOfLines >= 10){
+            if(numberOfLines >= 8){
                 if(word.contains(".")){
                     break;
+                } else {
+                    output.append(" ");
                 }
+            } else {
+                output.append(" ");
             }
         }
         listArray.add(output.toString());

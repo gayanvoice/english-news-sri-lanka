@@ -1,6 +1,6 @@
 package com.example.demo.model.data;
 
-import com.example.demo.model.PostsModel;
+import com.example.demo.model.PostModel;
 
 public class ImageModel {
     private String url;
@@ -61,14 +61,14 @@ public class ImageModel {
         this.source = source;
     }
 
-    public ImageModel getImageModel(PostsModel postsModel){
+    public ImageModel getImageModel(PostModel postModel){
         ImageModel imageModel = new ImageModel();
-        imageModel.setUrl(postsModel.getUrl());
-        imageModel.setTitle(postsModel.getTitle());
-        imageModel.setDescription(postsModel.getContent());
-        imageModel.setTime(postsModel.getPublishTime().toString());
-        imageModel.setDate(postsModel.getPublishTime().toString());
-        imageModel.setSource(postsModel.getSite());
+        imageModel.setUrl(postModel.getUrl());
+        imageModel.setTitle(postModel.getTitle());
+        imageModel.setDescription(postModel.getContent());
+        imageModel.setTime(postModel.getPublishTime().toString());
+        imageModel.setDate(postModel.getPublishTime().toString());
+        imageModel.setSource(postModel.getSite());
         return imageModel;
     }
 }

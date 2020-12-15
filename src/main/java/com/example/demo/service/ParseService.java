@@ -1,10 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.model.PostsModel;
+import com.example.demo.model.PostModel;
 import com.example.demo.model.constant.HostEnum;
 import com.example.demo.model.data.FeedModel;
 import com.rometools.rome.feed.synd.SyndEntry;
-import org.jdom2.Element;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,16 +16,29 @@ import java.util.List;
 @Service
 public class ParseService {
 
-    public PostsModel parse(SyndEntry entry, String hostName) {
-        PostsModel postsModel = new PostsModel();
-        postsModel.setPostId(getPostId());
-        postsModel.setTitle(entry.getTitle());
-        postsModel.setContent(getContent(entry.getLink(),hostName).substring(0, 512));
-        postsModel.setPublishTime(getCurrentTime());
-        postsModel.setUrl(entry.getLink());
-        postsModel.setSite(hostName);
-        postsModel.setPost("null");
-        return postsModel;
+    public PostModel parse(SyndEntry entry, String hostName) {
+        PostModel postModel = new PostModel();
+        postModel.setPostId(getPostId());
+        postModel.setTitle(entry.getTitle());
+        postModel.setContent(limitContent(getContent(entry.getLink(),hostName)));
+        postModel.setPublishTime(getCurrentTime());
+        postModel.setUrl(entry.getLink());
+        postModel.setSite(hostName);
+        postModel.setPost("null");
+        return postModel;
+    }
+
+    private String limitContent(String content){
+        if(content.length() >= 512){
+            try{
+                return content.substring(0, 512);
+            } catch (Exception ignored) {
+                return "null";
+            }
+        } else {
+            return content;
+        }
+
     }
 
     private Document requestDocument(String url) throws IOException {
@@ -39,6 +51,9 @@ public class ParseService {
     public List<FeedModel> getFeedModel(){
         List<FeedModel> feedModelList = new ArrayList<>();
         feedModelList.add(new FeedModel("https://economynext.com/feed/", HostEnum.EconomyNext));
+        feedModelList.add(new FeedModel("https://nation.lk/online/rss.xml", HostEnum.NationLK));
+        feedModelList.add(new FeedModel("http://www.sundayobserver.lk/taxonomy/term/5/all/feed", HostEnum.SundayOberver));
+        feedModelList.add(new FeedModel("http://www.adaderana.lk/rss.php", HostEnum.AdaDerana));
         return feedModelList;
     }
 
@@ -48,20 +63,12 @@ public class ParseService {
             Document document = requestDocument(url);
             if (hostName.equals(HostEnum.EconomyNext.getValue())) {
                 content = document.getElementById("article-content").getElementsByTag("p").text();
-            } else if (hostName.equals(HostEnum.BBCNews.getValue())) {
-                content = document.getElementsByTag("main").text();
-            } else if (hostName.equals(HostEnum.NewsFirst.getValue())) {
-                content = document.getElementsByClass("editor-styles").text();
-            } else if (hostName.equals(HostEnum.NethNews.getValue())) {
-                content = document.getElementsByClass("td-post-content").text();
-            } else if (hostName.equals(HostEnum.Silumina.getValue())) {
+            } else if (hostName.equals(HostEnum.NationLK.getValue())) {
+                content = document.getElementsByClass("post-single-content").text();
+            } else if (hostName.equals(HostEnum.SundayOberver.getValue())) {
                 content = document.getElementsByClass("field-name-body").text();
-            } else if (hostName.equals(HostEnum.ITN.getValue())) {
-                content = document.getElementsByClass("column9").text();
-            } else if (hostName.equals(HostEnum.ColomboTimes.getValue())) {
-                content = document.getElementsByClass("post-content").text();
-            } else if (hostName.equals(HostEnum.Dinamina.getValue())) {
-                content = document.getElementsByClass("content").text();
+            } else if (hostName.equals(HostEnum.AdaDerana.getValue())) {
+                content = document.getElementsByClass("news-content").text();
             } else {
                 content = null;
             }

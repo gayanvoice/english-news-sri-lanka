@@ -4,8 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Document(collection = "posts")
-public class PostsModel {
+@Document(collection = "post")
+public class PostModel {
 
     @Id
     private String postId;
@@ -17,10 +17,10 @@ public class PostsModel {
     private String post;
 
 
-    public PostsModel() {
+    public PostModel() {
     }
 
-    public PostsModel(String postId, String title, String content, LocalDateTime publishTime, String url, String site, String post) {
+    public PostModel(String postId, String title, String content, LocalDateTime publishTime, String url, String site, String post) {
         this.postId = postId;
         this.title = title;
         this.content = content;

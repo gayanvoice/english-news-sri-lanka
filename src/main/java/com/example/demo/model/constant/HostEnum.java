@@ -2,13 +2,9 @@ package com.example.demo.model.constant;
 
 public enum HostEnum {
     EconomyNext("EconomyNext"),
-    BBCNews("BBCNews"),
-    NewsFirst("NewsFirst"),
-    NethNews("NethNews"),
-    Silumina("Silumina"),
-    Dinamina("Dinamina"),
-    ITN("ITN"),
-    ColomboTimes("ColomboTimes");
+    NationLK("NationLK"),
+    SundayOberver("SundayObserver"),
+    AdaDerana("AdaDerana");
 
     private final String value;
 
