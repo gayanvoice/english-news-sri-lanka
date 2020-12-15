@@ -29,16 +29,19 @@ public class ParseService {
     }
 
     private String limitContent(String content){
-        if(content.length() >= 512){
-            try{
-                return content.substring(0, 512);
-            } catch (Exception ignored) {
-                return "null";
+        try {
+            if(content.length() >= 512){
+                try{
+                    return content.substring(0, 512);
+                } catch (Exception ignored) {
+                    return "null";
+                }
+            } else {
+                return content;
             }
-        } else {
-            return content;
+        } catch (Exception ignores) {
+            return "null";
         }
-
     }
 
     private Document requestDocument(String url) throws IOException {
@@ -50,7 +53,6 @@ public class ParseService {
 
     public List<FeedModel> getFeedModel(){
         List<FeedModel> feedModelList = new ArrayList<>();
-        feedModelList.add(new FeedModel("https://economynext.com/feed/", HostEnum.EconomyNext));
         feedModelList.add(new FeedModel("https://nation.lk/online/rss.xml", HostEnum.NationLK));
         feedModelList.add(new FeedModel("http://www.sundayobserver.lk/taxonomy/term/5/all/feed", HostEnum.SundayOberver));
         feedModelList.add(new FeedModel("http://www.adaderana.lk/rss.php", HostEnum.AdaDerana));
@@ -61,9 +63,7 @@ public class ParseService {
         String content;
         try {
             Document document = requestDocument(url);
-            if (hostName.equals(HostEnum.EconomyNext.getValue())) {
-                content = document.getElementById("article-content").getElementsByTag("p").text();
-            } else if (hostName.equals(HostEnum.NationLK.getValue())) {
+            if (hostName.equals(HostEnum.NationLK.getValue())) {
                 content = document.getElementsByClass("post-single-content").text();
             } else if (hostName.equals(HostEnum.SundayOberver.getValue())) {
                 content = document.getElementsByClass("field-name-body").text();
