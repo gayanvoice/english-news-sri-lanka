@@ -27,7 +27,7 @@ public class PostService {
     }
 
     public Optional<PostModel> findTopPost(){
-        return postRepository.findTopByContentNotAndPost("null", "null");
+        return postRepository.findTopByPost("null");
     }
 
 

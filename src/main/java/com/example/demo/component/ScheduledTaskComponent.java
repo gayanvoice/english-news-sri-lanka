@@ -20,6 +20,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Component
 public class ScheduledTaskComponent {
@@ -110,24 +111,43 @@ public class ScheduledTaskComponent {
                 log.info("postFaceBookFeed()");
                 postService.findTopPost().ifPresent(postModel -> {
                     log.info(postModel.getTitle() + " " + postModel.getPostId());
-                    try {
-                        Optional<FacebookResponseModel> facebookResponseModel = Optional
-                                .ofNullable(facebookService.postFaceBookFeedRequest(
-                                        postModel.getTitle() +
-                                                "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + " #news #englishnews #lk #lka #srilanka" +
-                                                "\n\n" + "\uD83D\uDD17 " + postModel.getUrl(),
-                                        postModel.getPostId()));
-                        if (facebookResponseModel.isPresent()) {
-                            postModel.setPost(facebookResponseModel.get().getId());
-                            postService.updatePost(postModel);
-                            log.info("updatePost()");
-                        }
-                    } catch (Exception ignored) { }
+                    if(getRandomBoolean()){
+                        try {
+                            Optional<FacebookResponseModel> facebookResponseModel = Optional
+                                    .ofNullable(facebookService.postFaceBookFeedRequest(
+                                            postModel.getTitle() +
+                                                    "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + "\n#news #englishnews #lk #lka #srilanka",
+                                            postModel.getUrl()));
+                            if (facebookResponseModel.isPresent()) {
+                                postModel.setPost(facebookResponseModel.get().getId());
+                                postService.updatePost(postModel);
+                                log.info("updatePost()");
+                            }
+                        } catch (Exception ignored) { }
+                    } else {
+                        try {
+                            Optional<FacebookResponseModel> facebookResponseModel = Optional
+                                    .ofNullable(facebookService.postFaceBookPhotosRequest(
+                                            postModel.getTitle() +
+                                                    "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + "\n#news #englishnews #lk #lka #srilanka" +
+                                                    "\n\n" + "\uD83D\uDD17 " + postModel.getUrl(),
+                                            postModel.getPostId()));
+                            if (facebookResponseModel.isPresent()) {
+                                postModel.setPost(facebookResponseModel.get().getId());
+                                postService.updatePost(postModel);
+                                log.info("updatePost()");
+                            }
+                        } catch (Exception ignored) { }
+                    }
                 });
             }
         } else {
             log.error("postFaceBookFeed dev");
         }
+    }
+
+    public boolean getRandomBoolean() {
+        return new Random().nextBoolean();
     }
 
     private boolean isTimeBetweenRange() {

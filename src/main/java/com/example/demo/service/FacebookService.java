@@ -30,11 +30,11 @@ public class FacebookService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public FacebookResponseModel postFaceBookFeedRequest(String message, String postId) {
+    public FacebookResponseModel postFaceBookFeedRequest(String message, String url) {
         try {
             ResponseEntity<FacebookResponseModel> responseEntity = getResponseEntity(
-                    new URL("https://graph.facebook.com/" + facebookPageId + "/photos"),
-                    new HttpEntity<>(getHeaderMap(facebookAuthenticationKey, message, postId), getHttpHeaders()));
+                    new URL("https://graph.facebook.com/" + facebookPageId + "/feed"),
+                    new HttpEntity<>(getPostUrlHeaderMap(facebookAuthenticationKey, message, url), getHttpHeaders()));
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else {
@@ -45,16 +45,40 @@ public class FacebookService {
         }
     }
 
+    public FacebookResponseModel postFaceBookPhotosRequest(String message, String postId) {
+        try {
+            ResponseEntity<FacebookResponseModel> responseEntity = getResponseEntity(
+                    new URL("https://graph.facebook.com/" + facebookPageId + "/photos"),
+                    new HttpEntity<>(getPostPhotoHeaderMap(facebookAuthenticationKey, message, postId), getHttpHeaders()));
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                return responseEntity.getBody();
+            } else {
+                return null;
+            }
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
+
     private ResponseEntity<FacebookResponseModel> getResponseEntity(URL url, HttpEntity<Map<String, Object>> httpEntity){
         return this.restTemplate.postForEntity(url.toString(), httpEntity, FacebookResponseModel.class);
     }
 
-    private Map<String, Object> getHeaderMap(String accessToken, String message, String postId){
+    private Map<String, Object> getPostPhotoHeaderMap(String accessToken, String message, String postId){
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("access_token", accessToken);
         headerMap.put("message", message);
         headerMap.put("url", appUrl + postId + "/image.jpg");
         System.out.println(appUrl + postId + "/image.jpg");
+        return headerMap;
+    }
+
+    private Map<String, Object> getPostUrlHeaderMap(String accessToken, String message, String url){
+        Map<String, Object> headerMap = new HashMap<>();
+        headerMap.put("access_token", accessToken);
+        headerMap.put("message", message);
+        headerMap.put("link", url);
         return headerMap;
     }
 
