@@ -19,18 +19,19 @@ public class PostService {
     }
 
     public boolean checkPostExists(String url) {
-        if(postRepository.findByUrl(url).isPresent()){
-            return true;
-        } else {
-            return false;
-        }
+        return postRepository.findByUrl(url).isPresent();
     }
 
     public Optional<PostModel> findByPostId(String postId){
-        return postRepository.findTopByPostId(postId);
+        return postRepository.findByPostId(postId);
     }
 
-    public void updateNewsPostSocialMediaStatus(PostModel postModel) {
+    public Optional<PostModel> findTopPost(){
+        return postRepository.findTopByContentNotAndPost("null", "null");
+    }
+
+
+    public void updatePost(PostModel postModel) {
         postRepository.save(postModel);
     }
 }

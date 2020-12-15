@@ -44,9 +44,8 @@ public class ImageService {
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setColor(Color.WHITE);
         lineLocation = renderLines(graphics2D, imageModel.getTitle(), false,28, Font.PLAIN,20, 30, 20, lineLocation) + 10;
-        lineLocation = renderLines(graphics2D, imageModel.getDescription(), true, 18, Font.PLAIN, 44, 20, 20,  lineLocation) + 10;
-        lineLocation = renderLines(graphics2D, "Source: " + imageModel.getSource(), false,  18, Font.PLAIN, 50, 20, 20,  lineLocation);
-//        lineLocation = renderLines(graphics2D, getTime() + " | " + getDate() + " | " + appName, false,16, Font.PLAIN, 50, 20, 50,  480);
+        lineLocation = renderLines(graphics2D, imageModel.getDescription(), true, 18, Font.PLAIN, 40, 20, 20,  lineLocation) + 10;
+        renderLines(graphics2D, "Source: " + imageModel.getSource(), false,  18, Font.PLAIN, 50, 20, 20,  lineLocation);
         return graphics2D;
     }
 

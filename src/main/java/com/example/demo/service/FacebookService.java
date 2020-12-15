@@ -20,6 +20,9 @@ public class FacebookService {
     @Value("${facebook.page.id}")
     private String facebookPageId;
 
+    @Value("${app.url}")
+    private String appUrl;
+
     private static final Logger log = LoggerFactory.getLogger(FacebookService.class);
     private final RestTemplate restTemplate;
 
@@ -27,11 +30,11 @@ public class FacebookService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public FacebookResponseModel postFaceBookFeedRequest(String message) {
+    public FacebookResponseModel postFaceBookFeedRequest(String message, String postId) {
         try {
             ResponseEntity<FacebookResponseModel> responseEntity = getResponseEntity(
-                    new URL("https://graph.facebook.com/" + facebookPageId + "/feed"),
-                    new HttpEntity<>(getHeaderMap(facebookAuthenticationKey, message), getHttpHeaders()));
+                    new URL("https://graph.facebook.com/" + facebookPageId + "/photos"),
+                    new HttpEntity<>(getHeaderMap(facebookAuthenticationKey, message, postId), getHttpHeaders()));
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else {
@@ -46,10 +49,12 @@ public class FacebookService {
         return this.restTemplate.postForEntity(url.toString(), httpEntity, FacebookResponseModel.class);
     }
 
-    private Map<String, Object> getHeaderMap(String accessToken, String message){
+    private Map<String, Object> getHeaderMap(String accessToken, String message, String postId){
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("access_token", accessToken);
         headerMap.put("message", message);
+        headerMap.put("url", appUrl + postId + "/image.jpg");
+        System.out.println(appUrl + postId + "/image.jpg");
         return headerMap;
     }
 

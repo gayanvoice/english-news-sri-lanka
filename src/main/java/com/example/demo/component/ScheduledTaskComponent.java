@@ -2,6 +2,7 @@ package com.example.demo.component;
 
 import com.example.demo.model.PostModel;
 import com.example.demo.model.data.FeedModel;
+import com.example.demo.model.facebook.FacebookResponseModel;
 import com.example.demo.service.*;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ScheduledTaskComponent {
@@ -25,7 +27,7 @@ public class ScheduledTaskComponent {
     @Value("${mode}")
     private String mode;
 
-    @Value("${app.status.url}")
+    @Value("${app.url}")
     private String appUrl;
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTaskComponent.class);
@@ -47,7 +49,7 @@ public class ScheduledTaskComponent {
     @Scheduled(fixedRate = 600000)
     public void setAlive() {
         if(mode.equals("prod")) {
-            if (restService.setAlive(appUrl)) {
+            if (restService.setAlive(appUrl + "status")) {
                 log.info("set alive ok " + getCurrentTime());
             } else {
                 log.error("set alive null " + getCurrentTime());
@@ -101,31 +103,28 @@ public class ScheduledTaskComponent {
         }
     }
 
-    @Scheduled(fixedDelay = 900000)
+    @Scheduled(fixedDelay = 1800000)
     public void postFaceBookFeed() {
         if(mode.equals("prod")) {
-//            if (!isTimeBetweenRange()) {
-//                log.info("postFaceBookFeed()");
-//                newsService.getLatestPost().ifPresent(latestNewsModel -> {
-//                    newsService.getLatestNullPost().ifPresent(latestNullNewsModel -> {
-//                        if (latestNullNewsModel.getId() > (latestNewsModel.getId() - 10)) {
-//                            try {
-//                                Optional<FacebookResponseModel> facebookResponseModel = Optional
-//                                        .ofNullable(facebookService.postFaceBookFeedRequest(
-//                                                latestNullNewsModel.getTitle() +
-//                                                        "\n\n" + "#SinhalaNewsInfo " + "#" + latestNullNewsModel.getSite() +
-//                                                        "\n\n" + "\uD83D\uDD17 " + latestNullNewsModel.getUrl()));
-//                                if (facebookResponseModel.isPresent()) {
-//                                    latestNullNewsModel.setPost(facebookResponseModel.get().getId());
-//                                    newsService.updateNewsPostSocialMediaStatus(latestNullNewsModel);
-//                                    log.info("updateNewsPostSocialMediaStatus()");
-//                                }
-//                            } catch (Exception ignore) { }
-//
-//                        }
-//                    });
-//                });
-//            }
+            if (!isTimeBetweenRange()) {
+                log.info("postFaceBookFeed()");
+                postService.findTopPost().ifPresent(postModel -> {
+                    log.info(postModel.getTitle() + " " + postModel.getPostId());
+                    try {
+                        Optional<FacebookResponseModel> facebookResponseModel = Optional
+                                .ofNullable(facebookService.postFaceBookFeedRequest(
+                                        postModel.getTitle() +
+                                                "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + " #news #englishnews #lk #lka #srilanka" +
+                                                "\n\n" + "\uD83D\uDD17 " + postModel.getUrl(),
+                                        postModel.getPostId()));
+                        if (facebookResponseModel.isPresent()) {
+                            postModel.setPost(facebookResponseModel.get().getId());
+                            postService.updatePost(postModel);
+                            log.info("updatePost()");
+                        }
+                    } catch (Exception ignored) { }
+                });
+            }
         } else {
             log.error("postFaceBookFeed dev");
         }
