@@ -43,15 +43,28 @@ public class ImageService {
         int lineLocation = 40;
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setColor(Color.WHITE);
-        lineLocation = renderLines(graphics2D, imageModel.getTitle(), 28, Font.BOLD,20, 30, 20, lineLocation) + 10;
-        lineLocation = renderLines(graphics2D, imageModel.getDescription(), 20, Font.PLAIN, 40, 20, 20,  lineLocation) + 10;
-        lineLocation = renderLines(graphics2D, "Source: " + imageModel.getSource(), 18, Font.BOLD, 50, 20, 20,  lineLocation);
-        lineLocation = renderLines(graphics2D, getTime() + " | " + getDate() + " | " + appName,16, Font.PLAIN, 50, 20, 80,  480);
+        lineLocation = renderLines(graphics2D, imageModel.getTitle(), false,28, Font.PLAIN,20, 30, 20, lineLocation) + 10;
+        lineLocation = renderLines(graphics2D, imageModel.getDescription(), true, 20, Font.PLAIN, 40, 20, 20,  lineLocation) + 10;
+        lineLocation = renderLines(graphics2D, "Source: " + imageModel.getSource(), false,  18, Font.PLAIN, 50, 20, 20,  lineLocation);
+        lineLocation = renderLines(graphics2D, getTime() + " | " + getDate() + " | " + appName, false,16, Font.PLAIN, 50, 20, 50,  480);
         return graphics2D;
     }
 
-    private int renderLines(Graphics2D graphics2D, String text, int fontSize, int fontType,  int lineSize, int linePaddingTop, int paddingLeft, int lineLocation) {
-        graphics2D.setFont(new Font("Arial", fontType, fontSize));
+    private int renderLines(Graphics2D graphics2D, String text, boolean fontFamily, int fontSize, int fontType,  int lineSize, int linePaddingTop, int paddingLeft, int lineLocation) {
+        if(fontFamily){
+            try{
+                graphics2D.setFont(Font.createFont(
+                        Font.TRUETYPE_FONT,getClass().getResourceAsStream("/static/font/Roboto-Light.ttf"))
+                        .deriveFont(fontType, fontSize));
+            } catch (Exception ignored) {  }
+        } else {
+            try{
+                graphics2D.setFont(Font.createFont(
+                        Font.TRUETYPE_FONT,getClass().getResourceAsStream("/static/font/Roboto-Regular.ttf"))
+                        .deriveFont(fontType, fontSize));
+            } catch (Exception ignored) {  }
+        }
+
         for (String item:addLinebreaks(text, lineSize)) {
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics2D.drawString(item, paddingLeft, lineLocation);
