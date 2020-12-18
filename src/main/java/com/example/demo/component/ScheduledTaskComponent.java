@@ -49,7 +49,7 @@ public class ScheduledTaskComponent {
 
     @Scheduled(fixedRate = 600000)
     public void setAlive() {
-        if(mode.equals("prod")) {
+        if (mode.equals("prod")) {
             if (restService.setAlive(appUrl + "status")) {
                 log.info("set alive ok " + getCurrentTime());
             } else {
@@ -62,7 +62,7 @@ public class ScheduledTaskComponent {
 
     @Scheduled(fixedDelay = 900000)
     public void fetchFeedUrlList() {
-        if(mode.equals("prod")) {
+        if (mode.equals("prod")) {
             for (FeedModel feedModel : parseService.getFeedModel()) {
                 log.info("getFeedModel " + feedModel.getHostName());
                 try {
@@ -106,12 +106,12 @@ public class ScheduledTaskComponent {
 
     @Scheduled(fixedDelay = 1800000)
     public void postFaceBookFeed() {
-        if(mode.equals("prod")) {
+        if (mode.equals("prod")) {
             if (!isTimeBetweenRange()) {
                 log.info("postFaceBookFeed()");
-                postService.findTopPost().ifPresent(postModel -> {
+                postService.findTopNullPost().ifPresent(postModel -> {
                     log.info(postModel.getTitle() + " " + postModel.getPostId());
-                    if(getRandomBoolean()){
+                    if (getRandomBoolean()) {
                         try {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
@@ -123,7 +123,8 @@ public class ScheduledTaskComponent {
                                 postService.updatePost(postModel);
                                 log.info("updatePost()");
                             }
-                        } catch (Exception ignored) { }
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         try {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
@@ -137,7 +138,8 @@ public class ScheduledTaskComponent {
                                 postService.updatePost(postModel);
                                 log.info("updatePost()");
                             }
-                        } catch (Exception ignored) { }
+                        } catch (Exception ignored) {
+                        }
                     }
                 });
             }

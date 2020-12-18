@@ -3,12 +3,11 @@ package com.example.demo.service;
 import com.example.demo.model.PostModel;
 import com.example.demo.repository.PostRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
 public class PostService {
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
     public PostService(PostRepository postRepository) {
         this.postRepository = postRepository;
@@ -26,10 +25,9 @@ public class PostService {
         return postRepository.findByPostId(postId);
     }
 
-    public Optional<PostModel> findTopPost(){
-        return postRepository.findTopByPost("null");
+    public Optional<PostModel> findTopNullPost(){
+        return postRepository.findFirstByPostOrderByPublishTimeDesc("null");
     }
-
 
     public void updatePost(PostModel postModel) {
         postRepository.save(postModel);
