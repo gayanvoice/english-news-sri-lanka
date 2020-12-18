@@ -1,8 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.model.facebook.FacebookResponseModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -23,7 +21,6 @@ public class FacebookService {
     @Value("${app.url}")
     private String appUrl;
 
-    private static final Logger log = LoggerFactory.getLogger(FacebookService.class);
     private final RestTemplate restTemplate;
 
     public FacebookService(RestTemplateBuilder restTemplateBuilder) {
