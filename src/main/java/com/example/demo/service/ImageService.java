@@ -80,7 +80,7 @@ public class ImageService {
                 listArray.add(output.toString());
                 output.setLength(0);
                 lineLen = 0;
-
+                numberOfLines = numberOfLines + 1;
             }
 
             output.append(word);
