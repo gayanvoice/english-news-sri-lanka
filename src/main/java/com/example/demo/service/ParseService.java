@@ -53,7 +53,7 @@ public class ParseService {
 
     public List<FeedModel> getFeedModel(){
         List<FeedModel> feedModelList = new ArrayList<>();
-        feedModelList.add(new FeedModel("https://nation.lk/online/rss.xml", HostEnum.NationLK));
+        feedModelList.add(new FeedModel("https://www.newsfirst.lk/feed/", HostEnum.NewsFirst));
         feedModelList.add(new FeedModel("http://www.sundayobserver.lk/taxonomy/term/5/all/feed", HostEnum.SundayOberver));
         feedModelList.add(new FeedModel("http://www.adaderana.lk/rss.php", HostEnum.AdaDerana));
         return feedModelList;
@@ -63,8 +63,8 @@ public class ParseService {
         String content;
         try {
             Document document = requestDocument(url);
-            if (hostName.equals(HostEnum.NationLK.getValue())) {
-                content = document.getElementsByClass("post-single-content").text();
+            if (hostName.equals(HostEnum.NewsFirst.getValue())) {
+                content = document.getElementsByClass("editor-styles").text();
             } else if (hostName.equals(HostEnum.SundayOberver.getValue())) {
                 content = document.getElementsByClass("field-name-body").text();
             } else if (hostName.equals(HostEnum.AdaDerana.getValue())) {

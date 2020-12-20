@@ -1,7 +1,7 @@
 package com.example.demo.model.constant;
 
 public enum HostEnum {
-    NationLK("NationLK"),
+    NewsFirst("NewsFirst"),
     SundayOberver("SundayObserver"),
     AdaDerana("AdaDerana");
 
