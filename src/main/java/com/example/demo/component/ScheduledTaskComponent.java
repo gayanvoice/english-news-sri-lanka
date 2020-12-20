@@ -18,9 +18,7 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Component
 public class ScheduledTaskComponent {
@@ -116,6 +114,7 @@ public class ScheduledTaskComponent {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
                                             postModel.getTitle() +
+                                                    "\n\n" + breakLines(postModel.getContent()) +
                                                     "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + "\n#news #englishnews #lk #lka #srilanka",
                                             postModel.getUrl()));
                             if (facebookResponseModel.isPresent()) {
@@ -146,6 +145,29 @@ public class ScheduledTaskComponent {
         } else {
             log.error("postFaceBookFeed dev");
         }
+    }
+
+    private String breakLines(String input) {
+        StringTokenizer token = new StringTokenizer(input, " ");
+        StringBuilder output = new StringBuilder();
+        int numberOfWords = 0;
+
+        while(token.hasMoreTokens()) {
+            String word = token.nextToken();
+            numberOfWords = numberOfWords + 1;
+            output.append(word);
+            if(numberOfWords >= 10){
+                if(word.contains(".")){
+                    break;
+                } else {
+                    output.append(" ");
+                }
+            } else {
+                output.append(" ");
+            }
+
+        }
+        return output.toString();
     }
 
     public boolean getRandomBoolean() {
