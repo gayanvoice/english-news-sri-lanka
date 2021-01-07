@@ -1,6 +1,7 @@
 package com.example.demo.component;
 
 import com.example.demo.model.PostModel;
+import com.example.demo.model.constant.HostEnum;
 import com.example.demo.model.data.FeedModel;
 import com.example.demo.model.facebook.FacebookResponseModel;
 import com.example.demo.service.*;
@@ -112,7 +113,7 @@ public class ScheduledTaskComponent {
         }
     }
 
-    @Scheduled(fixedDelay = 900000)
+    @Scheduled(fixedDelay = 1800000)
     public void postFaceBookFeed() {
         if (modeFacebook.equals("prod")) {
             if (!isTimeBetweenRange()) {
@@ -177,9 +178,20 @@ public class ScheduledTaskComponent {
     }
 
     private String createStatus(PostModel postModel) {
-        return postModel.getTitle()
-                + "\n\uD83D\uDD17 " + postModel.getUrl()
-                + "\n\n#EnglishNewsSriLanka #" + postModel.getSite() + " #lk #lka #SriLanka #Colombo";
+        return postModel.getTitle() + " " + getTwitterUrl(postModel.getSite())
+                + "\n#" + postModel.getSite() + " #SriLanka #Colombo #lk #lka";
+    }
+
+    private String getTwitterUrl(String site){
+        if(site.equals(HostEnum.AdaDerana.getValue())){
+            return "@adaderana";
+        } else if(site.equals(HostEnum.NewsFirst.getValue())){
+            return "@NewsfirstSL";
+        } else if(site.equals(HostEnum.SundayOberver.getValue())){
+            return "@observerlk";
+        } else {
+            return "@enslbot";
+        }
     }
 
     private String breakLines(String input) {
