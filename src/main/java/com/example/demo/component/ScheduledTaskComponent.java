@@ -125,7 +125,7 @@ public class ScheduledTaskComponent {
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
                                             postModel.getTitle() +
                                                     "\n\n" + breakLines(postModel.getContent()) +
-                                                    "\n\n" + "#" + postModel.getSite().toLowerCase(),
+                                                    "\n\n" + "#EnglishNewsSriLanka" + postModel.getSite().toLowerCase(),
                                             postModel.getUrl()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
@@ -139,8 +139,8 @@ public class ScheduledTaskComponent {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
                                     .ofNullable(facebookService.postFaceBookPhotosRequest(
                                             postModel.getTitle() +
-                                                    "\n\n" + "#ENSL " + "#" + postModel.getSite().toLowerCase() +
-                                                    "\n\n" + postModel.getUrl(),
+                                                    "\n\n" + "#EnglishNewsSriLanka " + "#" + postModel.getSite().toLowerCase() +
+                                                    "\n\n\uD83D\uDD17" + postModel.getUrl(),
                                             postModel.getPostId()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
@@ -179,7 +179,7 @@ public class ScheduledTaskComponent {
     private String createStatus(PostModel postModel) {
         return postModel.getTitle()
                 + "\n\uD83D\uDD17 " + postModel.getUrl()
-                + "\n\n#ENSL #" + postModel.getSite() + " #lk #lka #SriLanka #Colombo";
+                + "\n\n#EnglishNewsSriLanka #" + postModel.getSite() + " #lk #lka #SriLanka #Colombo";
     }
 
     private String breakLines(String input) {
