@@ -140,7 +140,7 @@ public class ScheduledTaskComponent {
                                     .ofNullable(facebookService.postFaceBookPhotosRequest(
                                             postModel.getTitle() +
                                                     "\n\n" + "#EnglishNewsSriLanka " + "#" + postModel.getSite().toLowerCase() +
-                                                    "\n\n\uD83D\uDD17" + postModel.getUrl(),
+                                                    "\n\n\uD83D\uDD17 " + postModel.getUrl(),
                                             postModel.getPostId()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
