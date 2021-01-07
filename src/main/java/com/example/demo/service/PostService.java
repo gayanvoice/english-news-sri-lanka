@@ -29,6 +29,14 @@ public class PostService {
         return postRepository.findFirstByPostOrderByPublishTimeDesc("null");
     }
 
+    public Optional<PostModel> findTopNullTweet(){
+        return postRepository.findTopByTweet("null");
+    }
+
+    public void updateTweet(PostModel postsModel) {
+        postRepository.save(postsModel);
+    }
+
     public void updatePost(PostModel postModel) {
         postRepository.save(postModel);
     }

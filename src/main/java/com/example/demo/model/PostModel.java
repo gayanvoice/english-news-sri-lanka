@@ -14,19 +14,21 @@ public class PostModel {
     private LocalDateTime publishTime;
     private String url;
     private String site;
+    private String tweet;
     private String post;
 
 
     public PostModel() {
     }
 
-    public PostModel(String postId, String title, String content, LocalDateTime publishTime, String url, String site, String post) {
+    public PostModel(String postId, String title, String content, LocalDateTime publishTime, String url, String site, String tweet, String post) {
         this.postId = postId;
         this.title = title;
         this.content = content;
         this.publishTime = publishTime;
         this.url = url;
         this.site = site;
+        this.tweet = tweet;
         this.post = post;
     }
 
@@ -76,6 +78,14 @@ public class PostModel {
 
     public void setSite(String site) {
         this.site = site;
+    }
+
+    public String getTweet() {
+        return tweet;
+    }
+
+    public void setTweet(String tweet) {
+        this.tweet = tweet;
     }
 
     public String getPost() {

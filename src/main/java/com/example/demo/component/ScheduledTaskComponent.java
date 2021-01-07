@@ -23,8 +23,15 @@ import java.util.*;
 @Component
 public class ScheduledTaskComponent {
 
-    @Value("${mode}")
-    private String mode;
+    @Value("${mode.parse}")
+    private String modeParse;
+
+    @Value("${mode.facebook}")
+    private String modeFacebook;
+
+    @Value("${mode.twitter}")
+    private String modeTwitter;
+
 
     @Value("${app.url}")
     private String appUrl;
@@ -34,20 +41,23 @@ public class ScheduledTaskComponent {
     private final ParseService parseService;
     private final PostService postService;
     private final FacebookService facebookService;
+    private final TwitterService twitterService;
 
     public ScheduledTaskComponent(RestService restService,
                                   ParseService parseService,
                                   PostService postService,
-                                  FacebookService facebookService) {
+                                  FacebookService facebookService,
+                                  TwitterService twitterService) {
         this.restService = restService;
         this.parseService = parseService;
         this.postService = postService;
         this.facebookService = facebookService;
+        this.twitterService = twitterService;
     }
 
     @Scheduled(fixedRate = 600000)
     public void setAlive() {
-        if (mode.equals("prod")) {
+        if (modeParse.equals("prod")) {
             if (restService.setAlive(appUrl + "status")) {
                 log.info("set alive ok " + getCurrentTime());
             } else {
@@ -60,7 +70,7 @@ public class ScheduledTaskComponent {
 
     @Scheduled(fixedDelay = 900000)
     public void fetchFeedUrlList() {
-        if (mode.equals("prod")) {
+        if (modeParse.equals("prod")) {
             for (FeedModel feedModel : parseService.getFeedModel()) {
                 log.info("getFeedModel " + feedModel.getHostName());
                 try {
@@ -102,9 +112,9 @@ public class ScheduledTaskComponent {
         }
     }
 
-    @Scheduled(fixedDelay = 1800000)
+    @Scheduled(fixedDelay = 900000)
     public void postFaceBookFeed() {
-        if (mode.equals("prod")) {
+        if (modeFacebook.equals("prod")) {
             if (!isTimeBetweenRange()) {
                 log.info("postFaceBookFeed()");
                 postService.findTopNullPost().ifPresent(postModel -> {
@@ -115,7 +125,7 @@ public class ScheduledTaskComponent {
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
                                             postModel.getTitle() +
                                                     "\n\n" + breakLines(postModel.getContent()) +
-                                                    "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + "\n#news #englishnews #lk #lka #srilanka",
+                                                    "\n\n" + "#" + postModel.getSite().toLowerCase(),
                                             postModel.getUrl()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
@@ -129,8 +139,8 @@ public class ScheduledTaskComponent {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
                                     .ofNullable(facebookService.postFaceBookPhotosRequest(
                                             postModel.getTitle() +
-                                                    "\n\n" + "#englishnewssrilanka " + "#" + postModel.getSite().toLowerCase() + "\n#news #englishnews #lk #lka #srilanka" +
-                                                    "\n\n" + "\uD83D\uDD17 " + postModel.getUrl(),
+                                                    "\n\n" + "#ENSL " + "#" + postModel.getSite().toLowerCase() +
+                                                    "\n\n" + postModel.getUrl(),
                                             postModel.getPostId()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
@@ -145,6 +155,31 @@ public class ScheduledTaskComponent {
         } else {
             log.error("postFaceBookFeed dev");
         }
+    }
+
+    @Scheduled(fixedDelay = 900000)
+    public void postTweet() {
+        if (modeTwitter.equals("prod")) {
+            if (!isTimeBetweenRange()) {
+                postService.findTopNullTweet().ifPresent(postModel -> {
+                    log.info(postModel.getTitle());
+                    Optional<String> twitterId = twitterService.postStatus(createStatus(postModel));
+                    if (twitterId.isPresent()) {
+                        postModel.setTweet(twitterId.get());
+                        postService.updateTweet(postModel);
+                        log.info("updateTweet()");
+                    }
+                });
+            }
+        } else {
+            log.error("postTweet dev");
+        }
+    }
+
+    private String createStatus(PostModel postModel) {
+        return postModel.getTitle()
+                + "\n\uD83D\uDD17 " + postModel.getUrl()
+                + "\n\n#ENSL #" + postModel.getSite() + " #lk #lka #SriLanka #Colombo";
     }
 
     private String breakLines(String input) {

@@ -8,4 +8,5 @@ public interface PostRepository extends MongoRepository<PostModel, String> {
     Optional<PostModel> findByUrl(String url);
     Optional<PostModel> findByPostId(String postId);
     Optional<PostModel> findFirstByPostOrderByPublishTimeDesc(String post);
+    Optional<PostModel> findTopByTweet(String tweet);
 }

@@ -32,7 +32,7 @@ public class ImageService {
         return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
     }
 
-    private Graphics2D createGraphics2D(BufferedImage bufferedImage, ImageModel imageModel){
+    private Graphics2D createGraphics2D(BufferedImage bufferedImage,ImageModel imageModel){
         int lineLocation = 160;
         Graphics2D graphics2D = bufferedImage.createGraphics();
         graphics2D.setColor(Color.WHITE);
@@ -59,16 +59,25 @@ public class ImageService {
             } catch (Exception ignored) {  }
         }
 
-        for (String item:addLinebreaks(text, lineSize)) {
-            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            graphics2D.drawString(item, 100, lineLocation);
-            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            lineLocation = lineLocation + linePaddingTop;
+        if(lineLocation >= 500){
+            for (String item:addLinebreaks(text, lineSize, 4)) {
+                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics2D.drawString(item, 100, lineLocation);
+                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                lineLocation = lineLocation + linePaddingTop;
+            }
+        } else {
+            for (String item:addLinebreaks(text, lineSize, 5)) {
+                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics2D.drawString(item, 100, lineLocation);
+                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                lineLocation = lineLocation + linePaddingTop;
+            }
         }
         return lineLocation;
     }
 
-    private java.util.List<String> addLinebreaks(String input, int maxLineLength) {
+    private java.util.List<String> addLinebreaks(String input, int maxLineLength, int maxLines) {
         StringTokenizer tok = new StringTokenizer(input, " ");
         StringBuilder output = new StringBuilder();
         int numberOfLines = 0;
@@ -82,11 +91,10 @@ public class ImageService {
                 lineLen = 0;
                 numberOfLines = numberOfLines + 1;
             }
-
             output.append(word);
             lineLen += word.length();
 
-            if(numberOfLines >= 5){
+            if(numberOfLines >= maxLines){
                 if(word.contains(".")){
                     break;
                 } else {

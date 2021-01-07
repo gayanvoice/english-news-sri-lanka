@@ -24,6 +24,7 @@ public class ParseService {
         postModel.setPublishTime(getCurrentTime());
         postModel.setUrl(entry.getLink());
         postModel.setSite(hostName);
+        postModel.setTweet("null");
         postModel.setPost("null");
         return postModel;
     }
