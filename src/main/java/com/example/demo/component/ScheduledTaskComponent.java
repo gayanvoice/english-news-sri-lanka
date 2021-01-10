@@ -126,7 +126,7 @@ public class ScheduledTaskComponent {
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
                                             postModel.getTitle() +
                                                     "\n\n" + breakLines(postModel.getContent()) +
-                                                    "\n\n" + "#EnglishNewsSriLanka "  + "#"+ postModel.getSite().toLowerCase() + " #SriLanka #lka #lka",
+                                                    "\n\n" + "#EnglishNewsSriLanka "  + "#"+ postModel.getSite().toLowerCase() + " #SriLanka #lk #lka",
                                             postModel.getUrl()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
