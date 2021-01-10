@@ -126,7 +126,7 @@ public class ScheduledTaskComponent {
                                     .ofNullable(facebookService.postFaceBookFeedRequest(
                                             postModel.getTitle() +
                                                     "\n\n" + breakLines(postModel.getContent()) +
-                                                    "\n\n" + "#EnglishNewsSriLanka "  + "#"+ postModel.getSite().toLowerCase(),
+                                                    "\n\n" + "#EnglishNewsSriLanka "  + "#"+ postModel.getSite().toLowerCase() + " #SriLanka #lka #lka",
                                             postModel.getUrl()));
                             if (facebookResponseModel.isPresent()) {
                                 postModel.setPost(facebookResponseModel.get().getId());
@@ -140,7 +140,7 @@ public class ScheduledTaskComponent {
                             Optional<FacebookResponseModel> facebookResponseModel = Optional
                                     .ofNullable(facebookService.postFaceBookPhotosRequest(
                                             postModel.getTitle() +
-                                                    "\n\n" + "#EnglishNewsSriLanka " + "#" + postModel.getSite().toLowerCase() +
+                                                    "\n\n" + "#EnglishNewsSriLanka " + "#" + postModel.getSite().toLowerCase() + " #SriLanka #lk #lka" +
                                                     "\n\n\uD83D\uDD17 " + postModel.getUrl(),
                                             postModel.getPostId()));
                             if (facebookResponseModel.isPresent()) {
@@ -158,10 +158,11 @@ public class ScheduledTaskComponent {
         }
     }
 
-    @Scheduled(fixedDelay = 900000)
+    @Scheduled(fixedDelay = 3600000)
     public void postTweet() {
         if (modeTwitter.equals("prod")) {
             if (!isTimeBetweenRange()) {
+                log.info("postTwitterFeed()");
                 postService.findTopNullTweet().ifPresent(postModel -> {
                     log.info(postModel.getTitle());
                     Optional<String> twitterId = twitterService.postStatus(createStatus(postModel));
@@ -178,20 +179,9 @@ public class ScheduledTaskComponent {
     }
 
     private String createStatus(PostModel postModel) {
-        return postModel.getTitle() + " " + getTwitterUrl(postModel.getSite())
-                + "\n#" + postModel.getSite() + " #SriLanka #Colombo #lk #lka";
-    }
-
-    private String getTwitterUrl(String site){
-        if(site.equals(HostEnum.AdaDerana.getValue())){
-            return "@adaderana";
-        } else if(site.equals(HostEnum.NewsFirst.getValue())){
-            return "@NewsfirstSL";
-        } else if(site.equals(HostEnum.SundayOberver.getValue())){
-            return "@observerlk";
-        } else {
-            return "@enslbot";
-        }
+        return postModel.getTitle()
+                + "\n#" + postModel.getSite() + " #SriLanka #Colombo"
+                + "\n " + postModel.getUrl();
     }
 
     private String breakLines(String input) {

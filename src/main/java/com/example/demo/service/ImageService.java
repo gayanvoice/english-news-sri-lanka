@@ -23,7 +23,7 @@ public class ImageService {
 
     public InputStream createInputStream(String postId) throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bufferedImage = ImageIO.read(getClass().getResourceAsStream("/static/image/template-black.jpg"));
+        bufferedImage = ImageIO.read(getClass().getResourceAsStream("/static/image/template.jpg"));
         postService.findByPostId(postId).ifPresent(postModel -> {
             Graphics2D graphics2D = createGraphics2D(bufferedImage, new ImageModel().getImageModel(postModel));
             graphics2D.dispose();
@@ -40,7 +40,7 @@ public class ImageService {
         renderLines(graphics2D, imageModel.getDescription(), true, 48, 36, 62, lineLocation);
 
         lineLocation = 1340;
-        renderLines(graphics2D, "Source: " + imageModel.getSource(), false,  48, 25, 20, lineLocation);
+        renderLines(graphics2D, "@" + imageModel.getSource(), false,  48, 25, 20, lineLocation);
         return graphics2D;
     }
 
